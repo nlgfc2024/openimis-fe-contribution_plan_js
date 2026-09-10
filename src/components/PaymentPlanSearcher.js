@@ -5,6 +5,7 @@ import {
     formatMessage,
     formatMessageWithValues,
     formatDateFromISO,
+    historyPush,
     Searcher,
     withTooltip,
     coreConfirm,
@@ -17,6 +18,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import PaymentPlanFilter from "./PaymentPlanFilter";
 import { IconButton } from "@material-ui/core";
+import AddIcon from '@material-ui/icons/Add';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from "@material-ui/icons/Delete";
@@ -24,6 +26,7 @@ import { isEmptyObject } from "../utils";
 import {
     ROWS_PER_PAGE_OPTIONS,
     DEFAULT_PAGE_SIZE,
+    RIGHT_PAYMENT_PLAN_CREATE,
     RIGHT_PAYMENT_PLAN_DELETE,
     RIGHT_PAYMENT_PLAN_UPDATE,
     RIGHT_PAYMENT_PLAN_REPLACE,
@@ -50,6 +53,21 @@ class PaymentPlanSearcher extends Component {
     }
 
     fetch = params => this.props.fetchPaymentPlans(this.props.modulesManager, params);
+
+    onCreate = () => historyPush(this.props.modulesManager, this.props.history, "contributionPlan.route.paymentPlan");
+
+    searcherActions = () => {
+        const { intl, rights } = this.props;
+        return [
+            {
+                label: formatMessage(intl, "paymentPlan", "paymentPlan.createButton.label"),
+                icon: <AddIcon />,
+                authorized: rights.includes(RIGHT_PAYMENT_PLAN_CREATE),
+                onClick: this.onCreate,
+                variant: "outlined",
+            },
+        ];
+    }
 
     headers = () => {
         const { rights } = this.props;
@@ -246,6 +264,9 @@ class PaymentPlanSearcher extends Component {
                     rowDisabled={this.isRowDisabled}
                     rowLocked={this.isRowDisabled}
                     defaultFilters={this.defaultFilters()}
+                    enableActionButtons
+                    searcherActionsPosition="header-right"
+                    searcherActions={this.searcherActions()}
                 />
             </Fragment>
         )

@@ -3,7 +3,6 @@ import { bindActionCreators } from "redux";
 import {
   withModulesManager,
   formatMessage,
-  withTooltip,
   historyPush,
   decodeId,
   Helmet,
@@ -14,28 +13,17 @@ import { withTheme, withStyles } from "@material-ui/core/styles";
 import { connect } from "react-redux";
 import {
   RIGHT_PAYMENT_PLAN_SEARCH,
-  RIGHT_PAYMENT_PLAN_CREATE,
   RIGHT_PAYMENT_PLAN_UPDATE,
   RIGHT_PAYMENT_PLAN_REPLACE,
   MODULE_NAME,
 } from "../constants";
 import PaymentPlanSearcher from "../components/PaymentPlanSearcher";
-import { Fab } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
 
 const styles = (theme) => ({
   page: theme.page,
-  fab: theme.fab,
 });
 
 class PaymentPlansPage extends Component {
-  onAdd = () =>
-    historyPush(
-      this.props.modulesManager,
-      this.props.history,
-      "contributionPlan.route.paymentPlan"
-    );
-
   paymentPlanPageLink = (paymentPlan) =>
     `${this.props.modulesManager.getRef("contributionPlan.route.paymentPlan")}${
       "/" + decodeId(paymentPlan.id)
@@ -93,24 +81,12 @@ class PaymentPlansPage extends Component {
             )}
           />
           <PaymentPlanSearcher
+            history={this.props.history}
             onDoubleClick={this.onDoubleClick}
             onReplace={this.onReplace}
             paymentPlanPageLink={this.paymentPlanPageLink}
             rights={rights}
           />
-          {rights.includes(RIGHT_PAYMENT_PLAN_CREATE) &&
-            withTooltip(
-              <div className={classes.fab}>
-                <Fab color="primary" onClick={this.onAdd}>
-                  <AddIcon />
-                </Fab>
-              </div>,
-              formatMessage(
-                intl,
-                "paymentPlan",
-                "paymentPlan.createButton.tooltip"
-              )
-            )}
         </div>
       )
     );
