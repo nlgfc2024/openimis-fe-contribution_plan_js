@@ -74,7 +74,6 @@ const PaymentPlanForm = ({
 
   const isMandatoryFieldsEmpty = useCallback(() =>
     !(
-      !!paymentPlan.code &&
       !!paymentPlan.name &&
       !!paymentPlan.benefitPlanTypeName &&
       !!paymentPlan.calculation &&

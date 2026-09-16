@@ -9,7 +9,6 @@ import {
     PublishedComponent,
     NumberInput,
     Contributions,
-    ValidatedTextInput,
 } from "@openimis/fe-core";
 import { connect } from "react-redux";
 import { injectIntl } from "react-intl";
@@ -26,11 +25,6 @@ import {
     PAYMENT_PLAN_TYPE,
 } from "../constants";
 
-import {
-    paymentPlanCodeClear,
-    paymentPlanCodeSetValid,
-    paymentPlanCodeValidation,
-} from "../actions"
 import PaymentPlanTypePicker from "../pickers/PaymentPlanTypePicker";
 import { isEmptyObject } from "../utils";
 import AdvancedCriteriaDialog from "../dialogs/AdvancedCriteriaDialog";
@@ -55,11 +49,6 @@ class PaymentPlanHeadPanel extends FormPanel {
           appliedFiltersRowStructure: [CLEARED_STATE_FILTER],
         };
     }
-
-    shouldValidate = (input) => {
-        const { savedCode } = this.props;
-        return input !== savedCode;
-    };
 
     updateTypeOfPaymentPlan = (field, value) => {
         this.updateAttributes({
@@ -135,9 +124,6 @@ class PaymentPlanHeadPanel extends FormPanel {
             mandatoryFieldsEmpty,
             setJsonExtValid,
             setRequiredValid,
-            isCodeValid,
-            isCodeValidating,
-            validationError,
             readOnly = false,
         }
             = this.props;
@@ -226,23 +212,13 @@ class PaymentPlanHeadPanel extends FormPanel {
                             />
                         </Grid>
                         <Grid item xs={GRID_ITEM_SIZE} className={classes.item}>
-                            <ValidatedTextInput
+                            <TextInput
                                 module="contributionPlan"
                                 label="code"
-                                required={true}
+                                helperText={paymentPlan?.id ? "" : formatMessage(intl, "paymentPlan", "label.code.hint.generatedOnSave")}
                                 value={!!paymentPlan.code ? paymentPlan.code : ""}
-                                readOnly={!!paymentPlan.id || readOnly}
-                                itemQueryIdentifier="paymentPlanCode"
-                                codeTakenLabel="paymentPlan.codeTaken"
-                                shouldValidate={this.shouldValidate}
-                                isValid={isCodeValid}
-                                isValidating={isCodeValidating}
-                                validationError={validationError}
-                                action={paymentPlanCodeValidation}
-                                clearAction={paymentPlanCodeClear}
-                                setValidAction={paymentPlanCodeSetValid}
-                                onChange={(v) => this.updateAttribute("code", v)}
-
+                                readOnly
+                                inputProps={{ readOnly: true }}
                             />
                         </Grid>
                         <Grid item xs={GRID_ITEM_SIZE} className={classes.item}>
@@ -432,15 +408,6 @@ class PaymentPlanHeadPanel extends FormPanel {
 }
 
 const mapStateToProps = (store) => ({
-    isCodeValid:
-    store.contributionPlan?.validationFields?.paymentPlanCode?.isValid,
-    isCodeValidating:
-    store.contributionPlan?.validationFields?.paymentPlanCode
-        ?.isValidating,
-    validationError:
-    store.contributionPlan?.validationFields?.paymentPlanCode
-        ?.validationError,
-    savedCode: store.contributionPlan?.paymentPlan?.code,
     calculationRulesList: store.calculation?.calculationRulesList || [],
 });
 
