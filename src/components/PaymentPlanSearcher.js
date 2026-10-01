@@ -64,7 +64,7 @@ class PaymentPlanSearcher extends Component {
                 icon: <AddIcon />,
                 authorized: rights.includes(RIGHT_PAYMENT_PLAN_CREATE),
                 onClick: this.onCreate,
-                variant: "outlined",
+                variant: "contained",
             },
         ];
     }
