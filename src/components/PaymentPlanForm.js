@@ -6,14 +6,15 @@ import {
   formatMessage,
   formatMessageWithValues,
   Helmet,
-  journalize
+  journalize,
+  parseData,
 } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import PaymentPlanHeadPanel from "./PaymentPlanHeadPanel";
-import { fetchPaymentPlan, clearPaymentPlan } from "../actions";
+import { fetchPaymentPlan, clearPaymentPlan, fetchPaymentPlanMutation } from "../actions";
 import { MAX_PERIODICITY_VALUE, MIN_PERIODICITY_VALUE } from "../constants";
 import _ from "lodash";
 
@@ -35,6 +36,7 @@ const PaymentPlanForm = ({
   modulesManager,
   fetchPaymentPlan,
   clearPaymentPlan,
+  fetchPaymentPlanMutation,
   fetchedPaymentPlan,
   paymentPlan: propsPaymentPlan,
   submittingMutation,
@@ -67,10 +69,39 @@ const PaymentPlanForm = ({
   useEffect(() => {
     if (prevSubmittingMutationRef.current && !submittingMutation) {
       journalize(mutation);
-      setClientMutationId(mutation.clientMutationId);
+      if (mutation?.id) {
+        setClientMutationId(mutation.clientMutationId);
+      }
     }
     prevSubmittingMutationRef.current = submittingMutation;
   }, [submittingMutation, mutation, journalize]);
+
+  useEffect(() => {
+    if (paymentPlanId || !clientMutationId) return undefined;
+
+    let cancelled = false;
+
+    const waitForSuccessfulCreation = async () => {
+      for (let attempt = 0; attempt < 60 && !cancelled; attempt += 1) {
+        const response = await fetchPaymentPlanMutation(clientMutationId);
+        const result = parseData(response?.payload?.data?.mutationLogs)?.[0];
+
+        if (cancelled) return;
+        if (result?.status === 2) {
+          back();
+          return;
+        }
+        if (result?.status === 1) {
+          setClientMutationId(null);
+          return;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+    };
+
+    waitForSuccessfulCreation();
+    return () => { cancelled = true; };
+  }, [paymentPlanId, clientMutationId, fetchPaymentPlanMutation, back]);
 
   const isMandatoryFieldsEmpty = useCallback(() =>
     !(
@@ -153,7 +184,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators({
-    fetchPaymentPlan, clearPaymentPlan, journalize
+    fetchPaymentPlan, clearPaymentPlan, fetchPaymentPlanMutation, journalize
   }, dispatch);
 };
 

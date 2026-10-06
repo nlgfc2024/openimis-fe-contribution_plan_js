@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { withModulesManager, withHistory, historyPush, formatMessage, formatMessageWithValues, coreAlert } from "@openimis/fe-core";
+import { withModulesManager, withHistory, historyPush, formatMessageWithValues } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
@@ -41,28 +41,6 @@ class PaymentPlanPage extends Component {
         }
     }
 
-    componentDidUpdate = prevProps => {
-        const {
-            paymentPlanId,
-            submittingMutation,
-            mutation,
-            coreAlert,
-            intl,
-        } = this.props;
-        if (
-            !paymentPlanId &&
-            prevProps.submittingMutation &&
-            !submittingMutation &&
-            mutation?.id
-        ) {
-            coreAlert(
-                formatMessage(intl, "paymentPlan", "alert.success"),
-                formatMessage(intl, "paymentPlan", "create.success"),
-            );
-            this.back();
-        }
-    }
-
     titleParams = paymentPlan => ({ label: !!paymentPlan.name ? paymentPlan.name : null });
 
     render() {
@@ -85,12 +63,10 @@ class PaymentPlanPage extends Component {
 const mapStateToProps = (state, props) => ({
     rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
     paymentPlanId: props.match.params.paymentplan_id,
-    submittingMutation: state.contributionPlan.submittingMutation,
-    mutation: state.contributionPlan.mutation,
 });
 
 const mapDispatchToProps = dispatch => {
-    return bindActionCreators({ createPaymentPlan, updatePaymentPlan, coreAlert }, dispatch);
+    return bindActionCreators({ createPaymentPlan, updatePaymentPlan }, dispatch);
 };
 
 export default withHistory(withModulesManager(injectIntl(withTheme(withStyles(styles)(connect(mapStateToProps, mapDispatchToProps)(PaymentPlanPage))))));
