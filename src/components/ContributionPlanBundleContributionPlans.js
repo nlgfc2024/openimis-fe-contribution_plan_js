@@ -117,7 +117,9 @@ class ContributionPlanBundleContributionPlans extends PagedDataHandler {
         const { intl, coreConfirm, deleteContributionPlanBundleContributionPlan } = this.props;
         let confirm = () => coreConfirm(
             formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.title", { label: contributionPlanBundleContributionPlan.contributionPlan.name }),
-            formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.message", { label: contributionPlanBundleContributionPlan.contributionPlan.name })
+            formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.message", { label: contributionPlanBundleContributionPlan.contributionPlan.name }),
+            null,
+            "warning"
         );
         let confirmedAction = () => {
             deleteContributionPlanBundleContributionPlan(
