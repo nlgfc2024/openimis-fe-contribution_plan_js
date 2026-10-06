@@ -182,7 +182,9 @@ class PaymentPlanSearcher extends Component {
         const { intl, coreConfirm, deletePaymentPlan } = this.props;
         let confirm = () => coreConfirm(
             formatMessageWithValues(intl, "paymentPlan", "deletePaymentPlan.confirm.title", { label: paymentPlan.name }),
-            formatMessageWithValues(intl, "paymentPlan", "deletePaymentPlan.confirm.message", { label: paymentPlan.name })
+            formatMessageWithValues(intl, "paymentPlan", "deletePaymentPlan.confirm.message", { label: paymentPlan.name }),
+            null,
+            "warning"
         );
         let confirmedAction = () => {
             deletePaymentPlan(
@@ -264,8 +266,7 @@ class PaymentPlanSearcher extends Component {
                     rowDisabled={this.isRowDisabled}
                     rowLocked={this.isRowDisabled}
                     defaultFilters={this.defaultFilters()}
-                    enableActionButtons
-                    searcherActionsPosition="header-right"
+                       enableHeaderActionButtons
                     searcherActions={this.searcherActions()}
                 />
             </Fragment>
