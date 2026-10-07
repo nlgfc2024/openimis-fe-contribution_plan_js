@@ -688,17 +688,6 @@ export function createPaymentPlan(paymentPlan, clientMutationLabel) {
   );
 }
 
-export function fetchPaymentPlanMutation(clientMutationId) {
-  return graphql(
-    formatPageQuery(
-      "mutationLogs",
-      [`clientMutationId: "${clientMutationId}"`],
-      ["status", "error"],
-    ),
-    "CONTRIBUTIONPLAN_PAYMENTPLAN_MUTATION_STATUS",
-  );
-}
-
 export function updatePaymentPlan(paymentPlan, clientMutationLabel) {
   let mutation = formatMutation(
     "updatePaymentPlan",

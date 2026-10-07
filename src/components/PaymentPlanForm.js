@@ -7,14 +7,14 @@ import {
   formatMessageWithValues,
   Helmet,
   journalize,
-  parseData,
+  waitForMutation,
 } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
 import { withTheme, withStyles } from "@material-ui/core/styles";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import PaymentPlanHeadPanel from "./PaymentPlanHeadPanel";
-import { fetchPaymentPlan, clearPaymentPlan, fetchPaymentPlanMutation } from "../actions";
+import { fetchPaymentPlan, clearPaymentPlan } from "../actions";
 import { MAX_PERIODICITY_VALUE, MIN_PERIODICITY_VALUE } from "../constants";
 import _ from "lodash";
 
@@ -36,7 +36,7 @@ const PaymentPlanForm = ({
   modulesManager,
   fetchPaymentPlan,
   clearPaymentPlan,
-  fetchPaymentPlanMutation,
+  waitForMutation,
   fetchedPaymentPlan,
   paymentPlan: propsPaymentPlan,
   submittingMutation,
@@ -82,26 +82,19 @@ const PaymentPlanForm = ({
     let cancelled = false;
 
     const waitForSuccessfulCreation = async () => {
-      for (let attempt = 0; attempt < 60 && !cancelled; attempt += 1) {
-        const response = await fetchPaymentPlanMutation(clientMutationId);
-        const result = parseData(response?.payload?.data?.mutationLogs)?.[0];
+      const result = await waitForMutation(clientMutationId);
 
-        if (cancelled) return;
-        if (result?.status === 2) {
-          back();
-          return;
-        }
-        if (result?.status === 1) {
-          setClientMutationId(null);
-          return;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (cancelled) return;
+      if (result?.status === 2) {
+        back();
+      } else if (result?.status === 1) {
+        setClientMutationId(null);
       }
     };
 
     waitForSuccessfulCreation();
     return () => { cancelled = true; };
-  }, [paymentPlanId, clientMutationId, fetchPaymentPlanMutation, back]);
+  }, [paymentPlanId, clientMutationId, waitForMutation, back]);
 
   const isMandatoryFieldsEmpty = useCallback(() =>
     !(
@@ -184,7 +177,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators({
-    fetchPaymentPlan, clearPaymentPlan, fetchPaymentPlanMutation, journalize
+    fetchPaymentPlan, clearPaymentPlan, journalize, waitForMutation
   }, dispatch);
 };
 
