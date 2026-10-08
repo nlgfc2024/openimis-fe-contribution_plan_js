@@ -81,6 +81,7 @@
   "paymentPlan.create.success": "Payment Plan created successfully.",
   "paymentPlan.label.code.hint.generatedOnSave": "Generated on save",
   "paymentPlan.mandatoryFieldsEmptyError": "* These fields are required",
+  "paymentPlan.PaymentPlanHeadPanel.save": "Save",
   "paymentPlan.saveButton.tooltip.enabled": "Save changes",
   "paymentPlan.saveButton.tooltip.disabled": "Please fill General Information fields first",
   "paymentPlan.deletePaymentPlan.confirm.title": "Delete Payment Plan {label}",

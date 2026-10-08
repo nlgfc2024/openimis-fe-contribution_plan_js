@@ -125,6 +125,8 @@ class PaymentPlanHeadPanel extends FormPanel {
             setJsonExtValid,
             setRequiredValid,
             readOnly = false,
+            onFormSave,
+            canSaveForm,
         }
             = this.props;
         const { benefitPlan: productOrBenefitPlan, calculation: calculationId, ...others } = this.props.edited;
@@ -360,6 +362,20 @@ class PaymentPlanHeadPanel extends FormPanel {
                             <Divider />
                         </>
                     )}
+                    {!readOnly && (
+                        <Grid container className={classes.item}>
+                            <Grid item xs={12} className={classes.item}>
+                                <Button
+                                    color="primary"
+                                    variant="contained"
+                                    onClick={() => onFormSave(this.props.edited)}
+                                    disabled={!canSaveForm || !canSaveForm()}
+                                >
+                                    {formatMessage(intl, "paymentPlan", "paymentPlan.PaymentPlanHeadPanel.save")}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    )}
                 </Fragment>
             );
         }
@@ -405,6 +421,20 @@ class PaymentPlanHeadPanel extends FormPanel {
                         />
                     </Grid>
                 </Grid>
+                {!readOnly && (
+                    <Grid container className={classes.item}>
+                        <Grid item xs={12} className={classes.item}>
+                            <Button
+                                color="primary"
+                                variant="contained"
+                                onClick={() => onFormSave(this.props.edited)}
+                                disabled={!canSaveForm || !canSaveForm()}
+                            >
+                                {formatMessage(intl, "paymentPlan", "paymentPlan.PaymentPlanHeadPanel.save")}
+                            </Button>
+                        </Grid>
+                    </Grid>
+                )}
             </Fragment>
         );
     }
