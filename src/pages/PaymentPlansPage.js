@@ -6,6 +6,7 @@ import {
   historyPush,
   decodeId,
   Helmet,
+  PageFeedbackBanner,
   clearCurrentPaginationPage,
 } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
@@ -80,6 +81,7 @@ class PaymentPlansPage extends Component {
               "paymentPlans.page.title"
             )}
           />
+          <PageFeedbackBanner />
           <PaymentPlanSearcher
             history={this.props.history}
             onDoubleClick={this.onDoubleClick}

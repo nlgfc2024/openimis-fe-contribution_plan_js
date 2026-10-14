@@ -8,6 +8,8 @@ import {
   Helmet,
   journalize,
   waitForMutation,
+  showPageFeedback,
+  coreAlert,
 } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
 import { withTheme, withStyles } from "@material-ui/core/styles";
@@ -42,6 +44,8 @@ const PaymentPlanForm = ({
   submittingMutation,
   mutation,
   journalize,
+  showPageFeedback,
+  coreAlert,
   titleParams: propsTitleParams,
 }) => {
   const [paymentPlan, setPaymentPlan] = useState({});
@@ -86,6 +90,16 @@ const PaymentPlanForm = ({
 
       if (cancelled) return;
       if (result?.status === 2) {
+        showPageFeedback({
+          severity: "success",
+          title: formatMessage(intl, "paymentPlan", "paymentPlan.create.success.title"),
+          message: formatMessage(intl, "paymentPlan", "paymentPlan.create.success.message"),
+        });
+        coreAlert({
+          severity: "success",
+          title: formatMessage(intl, "paymentPlan", "paymentPlan.create.popup.title"),
+          message: formatMessage(intl, "paymentPlan", "paymentPlan.create.popup.message"),
+        });
         back();
       } else if (result?.status === 1) {
         setClientMutationId(null);
@@ -94,7 +108,7 @@ const PaymentPlanForm = ({
 
     waitForSuccessfulCreation();
     return () => { cancelled = true; };
-  }, [paymentPlanId, clientMutationId, waitForMutation, back]);
+  }, [paymentPlanId, clientMutationId, waitForMutation, back, showPageFeedback, intl]);
 
   const isMandatoryFieldsEmpty = useCallback(() =>
     !(
@@ -177,7 +191,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators({
-    fetchPaymentPlan, clearPaymentPlan, journalize, waitForMutation
+    fetchPaymentPlan, clearPaymentPlan, journalize, waitForMutation, showPageFeedback, coreAlert
   }, dispatch);
 };
 
