@@ -6,7 +6,10 @@ import {
   formatMessage,
   formatMessageWithValues,
   Helmet,
-  journalize
+  journalize,
+  waitForMutation,
+  showPageFeedback,
+  coreAlert,
 } from "@openimis/fe-core";
 import { injectIntl } from "react-intl";
 import { withTheme, withStyles } from "@material-ui/core/styles";
@@ -35,11 +38,14 @@ const PaymentPlanForm = ({
   modulesManager,
   fetchPaymentPlan,
   clearPaymentPlan,
+  waitForMutation,
   fetchedPaymentPlan,
   paymentPlan: propsPaymentPlan,
   submittingMutation,
   mutation,
   journalize,
+  showPageFeedback,
+  coreAlert,
   titleParams: propsTitleParams,
 }) => {
   const [paymentPlan, setPaymentPlan] = useState({});
@@ -67,14 +73,45 @@ const PaymentPlanForm = ({
   useEffect(() => {
     if (prevSubmittingMutationRef.current && !submittingMutation) {
       journalize(mutation);
-      setClientMutationId(mutation.clientMutationId);
+      if (mutation?.id) {
+        setClientMutationId(mutation.clientMutationId);
+      }
     }
     prevSubmittingMutationRef.current = submittingMutation;
   }, [submittingMutation, mutation, journalize]);
 
+  useEffect(() => {
+    if (paymentPlanId || !clientMutationId) return undefined;
+
+    let cancelled = false;
+
+    const waitForSuccessfulCreation = async () => {
+      const result = await waitForMutation(clientMutationId);
+
+      if (cancelled) return;
+      if (result?.status === 2) {
+        showPageFeedback({
+          severity: "success",
+          title: formatMessage(intl, "paymentPlan", "paymentPlan.create.success.title"),
+          message: formatMessage(intl, "paymentPlan", "paymentPlan.create.success.message"),
+        });
+        coreAlert({
+          severity: "success",
+          title: formatMessage(intl, "paymentPlan", "paymentPlan.create.popup.title"),
+          message: formatMessage(intl, "paymentPlan", "paymentPlan.create.popup.message"),
+        });
+        back();
+      } else if (result?.status === 1) {
+        setClientMutationId(null);
+      }
+    };
+
+    waitForSuccessfulCreation();
+    return () => { cancelled = true; };
+  }, [paymentPlanId, clientMutationId, waitForMutation, back, showPageFeedback, intl]);
+
   const isMandatoryFieldsEmpty = useCallback(() =>
     !(
-      !!paymentPlan.code &&
       !!paymentPlan.name &&
       !!paymentPlan.benefitPlanTypeName &&
       !!paymentPlan.calculation &&
@@ -157,7 +194,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => {
   return bindActionCreators({
-    fetchPaymentPlan, clearPaymentPlan, journalize
+    fetchPaymentPlan, clearPaymentPlan, journalize, waitForMutation, showPageFeedback, coreAlert
   }, dispatch);
 };
 

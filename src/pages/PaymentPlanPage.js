@@ -62,7 +62,7 @@ class PaymentPlanPage extends Component {
 
 const mapStateToProps = (state, props) => ({
     rights: !!state.core && !!state.core.user && !!state.core.user.i_user ? state.core.user.i_user.rights : [],
-    paymentPlanId: props.match.params.paymentplan_id
+    paymentPlanId: props.match.params.paymentplan_id,
 });
 
 const mapDispatchToProps = dispatch => {

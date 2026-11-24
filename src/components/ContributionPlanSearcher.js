@@ -122,7 +122,9 @@ class ContributionPlanSearcher extends Component {
         const { intl, coreConfirm, deleteContributionPlan } = this.props;
         let confirm = () => coreConfirm(
             formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.title", { label: contributionPlan.name }),
-            formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.message", { label: contributionPlan.name })
+            formatMessageWithValues(intl, "contributionPlan", "deleteContributionPlan.confirm.message", { label: contributionPlan.name }),
+            null,
+            "warning"
         );
         let confirmedAction = () => {
             deleteContributionPlan(
